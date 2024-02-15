@@ -21,11 +21,13 @@ onMounted(() => {
 </script>
 
 <template>
+  <div class="background-image"></div>
   <div
     class="login-view-wrapper flex flex-column align-items-center w-full h-full relative px-3 md:justify-content-between md:px-0 sm:flex-row"
   >
+    <div class="blur h-full w-full absolute"></div>
     <h6
-      class="text-color font-light absolute top-0 w-full text-center mt-3"
+      class="desktop text-color font-light absolute top-0 w-full text-center mt-3"
       v-if="!isMobile"
     >
       {{ t("A") }}
@@ -36,6 +38,7 @@ onMounted(() => {
     <div class="wrapper-logo">
       <img class="logo" :src="logo1" />
     </div>
+
     <slot></slot>
     <Card class="login-card w-full md:w-30rem primary-color md:mr-5 py-0">
       <template #title>
@@ -49,15 +52,16 @@ onMounted(() => {
       class="flex justify-content-between absolute bottom-0 w-full px-3 pb-4"
     >
       <h6
-        class="font-light w-8rem md:w-27rem wrapper-legal-text"
-        v-if="!isMobile"
+        class="desktop copyright font-light w-8rem md:w-27rem wrapper-legal-text"
       >
         {{ t("Copyright @ 2024 Wetmore Enterprises. All rights reserved") }}
       </h6>
-      <h6 class="font-light w-8rem md:w-27rem wrapper-legal-text" v-else>
+      <h6
+        class="mobile copyright font-light w-8rem md:w-27rem wrapper-legal-text"
+      >
         {{ t("Copyright @ 2024 Wetmore Enterprises") }}
       </h6>
-      <div class="flex" v-if="!isMobile">
+      <div class="desktop policies flex">
         <h6 class="mr-2 font-light">{{ t("Terms of use") }}</h6>
         <h6 class="mr-2 font-light">{{ t("License Agreement") }}</h6>
         <h6 class="mr-2 font-light">{{ t("Privacy Policy") }}</h6>
@@ -66,7 +70,7 @@ onMounted(() => {
         </h6>
         <h6 class="font-light">{{ t("Cookies") }}</h6>
       </div>
-      <div v-else class="flex flex-column">
+      <div class="mobile policies flex flex-column">
         <h6 class="font-light wrapper-legal-text">
           {{ t("Legal Information") }}
         </h6>
@@ -79,11 +83,12 @@ onMounted(() => {
 </template>
 
 <style scoped lang="less">
-.login-view-wrapper {
+.background-image {
   background-image: url("../assets/success.jpg");
   background-position: center;
-  background-size: 100vw 100vh;
-  background-repeat: no-repeat;
+  background-size: contain;
+}
+.login-view-wrapper {
   overflow: hidden;
   .logo {
     width: 300px;
@@ -94,13 +99,57 @@ onMounted(() => {
     background-color: var(--primary-color);
   }
 }
-@media (max-width: 600px) {
-  .login-view-wrapper.register-auth-layout {
-    background-image: none;
-  }
+
+// @media only screen and (min-width: 1300px) and (max-width: 1400px) {
+//   .login-view-wrapper {
+//     background-size: 100% 100%;
+//   }
+// }
+// @media only screen and (min-width: 1290px) and (max-width: 1300px) {
+//   .login-view-wrapper {
+//     background-size: 110% 110%;
+//   }
+// }
+// @media only screen and (min-width: 1000px) and (max-width: 1289px) {
+//   .login-view-wrapper {
+//     background-size: 100% 50%;
+//   }
+// }
+
+// @media only screen and (min-width: 900px) and (max-width: 1000px) {
+//   .login-view-wrapper {
+//     background-size: 90% 60%;
+//   }
+// }
+// @media only screen and (min-width: 800px) and (max-width: 900px) {
+//   .login-view-wrapper {
+//     background-size: 90% 50%;
+//   }
+// }
+// @media only screen and (min-width: 601px) and (max-width: 800px) {
+//   .login-view-wrapper {
+//     background-size: 90% 40%;
+//   }
+// }
+// @media (min-width: 1290px) {
+//   .login-view-wrapper {
+//     .mobile.policies,
+//     .mobile.copyrigh {
+//       visibility: hidden;
+//     }
+//   }
+// }
+
+@media (max-width: 1163px) {
   .login-view-wrapper {
-    background-size: 100vw 40vh;
+    flex-direction: column !important;
+    justify-content: start !important;
     background-position: bottom;
+    backdrop-filter: blur(3px);
+    .desktop.policies,
+    .desktop.copyright {
+      visibility: hidden;
+    }
     .logo {
       width: 100px;
       height: 100px;
@@ -108,6 +157,23 @@ onMounted(() => {
       margin-top: 10px;
       margin-bottom: 10px;
     }
+    h6.desktop {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .background-image {
+    background-size: 100vw 40vh;
+  }
+  .login-view-wrapper.register-auth-layout {
+    background-image: none;
+  }
+  .login-view-wrapper {
+    // background-size: 100vw 40vh;
+    flex-direction: column !important;
+
     .login-card {
       background-color: var(--primary-color);
     }

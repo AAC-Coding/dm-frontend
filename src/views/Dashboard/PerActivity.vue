@@ -4,10 +4,11 @@ import { useI18n } from "vue-i18n";
 
 import CardComponent from "../../components/CardComponent.vue";
 
-import Skeleton from "primevue/skeleton";
 import { useToast } from "primevue/usetoast";
 
-import { Chart } from "highcharts-vue";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column"; // optional
+import Row from "primevue/row";
 
 import { useDashboardService } from "../../services/DashboardService";
 
@@ -23,97 +24,11 @@ const props = defineProps({
 const { t } = useI18n();
 const toast = useToast();
 const dashboardService = useDashboardService();
-
-const total = ref(0);
-const isLoading = ref();
-const chartOptions = ref({
-  chart: {
-    type: "pie",
-    height: 280,
-    width: 400,
-  },
-  title: {
-    text: t("Activity"),
-    style: {
-      fontWeight: "bold",
-      color: "#4b5563",
-      fontSize: "19px",
-      fontFamily: "Poppins",
-      textTransform: "Uppercase",
-    },
-    align: "left",
-  },
-  subtitle: {
-    style: { fontSize: "12px" },
-    align: "left",
-  },
-  tooltip: {
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    className: "tooltipPie",
-    pointFormat: "{point.custom.extraInformation}",
-  },
-  accessibility: {
-    point: {
-      valueSuffix: "$",
-    },
-  },
-  plotOptions: {
-    pie: {
-      allowPointSelect: true,
-      cursor: "pointer",
-      colors: ["#234b71", "#31c866", "#619cf8", "#e9b40f"],
-      dataLabels: {
-        enabled: true,
-        distance: 6,
-        format: "<b>{point.name}</b>: {point.y:.1f}",
-        style: {
-          fontSize: "12px",
-          fontWeight: "500",
-        },
-        filter: {
-          property: "percentage",
-          operator: ">",
-          value: 0,
-        },
-      },
-      showInLegend: false,
-    },
-    responsive: {
-      rules: [
-        {
-          condition: {
-            minWidth: 1000,
-          },
-          chartOptions: {
-            chart: {
-              style: { padding: "1rem" },
-            },
-            plotOptions: {
-              pie: {
-                dataLabels: {
-                  enabled: true,
-                  distance: 10,
-                  format: "{point.name}:&nbsp{point.percentage:.2f} %",
-                  style: {
-                    fontSize: "15px",
-                    fontWeight: "500",
-                  },
-                },
-              },
-            },
-          },
-        },
-      ],
-    },
-  },
-  series: [
-    {
-      colorByPoint: true,
-    },
-  ],
+const tableData = ref({
+  content: [],
+  rows: 10,
 });
-
+const isLoading = ref(false);
 const getPerActivityData = async () => {
   const result =
     "?" +
@@ -123,38 +38,6 @@ const getPerActivityData = async () => {
     }).toString();
   try {
     isLoading.value = true;
-    const res = await dashboardService.getActivityCount(result);
-    const chartData = [
-      {
-        name: "Dials",
-        y: res.data?.dials || 0,
-      },
-      {
-        name: "Doorknocks",
-        y: res.data?.doorknocks || 0,
-      },
-      {
-        name: "Appointments",
-        y: res.data?.appointments || 0,
-      },
-      {
-        name: "Presentations",
-        y: res.data?.presentations || 0,
-      },
-      {
-        name: "Recruiting interviews",
-        y: res.data?.recruiting_interview || 0,
-      },
-    ];
-    total.value = chartData.reduce((a, b) => a + b.y || 0, 0);
-    chartOptions.value.series[0] = {
-      ...chartOptions.value.series[0],
-      data: chartData,
-    };
-    chartOptions.value.subtitle = {
-      ...chartOptions.value.subtitle,
-      text: `${t("Total")}:${total.value}`,
-    };
   } catch (err) {
     toast.add({
       severity: "error",
@@ -190,19 +73,25 @@ onMounted(() => {
   <CardComponent>
     <template #content>
       <div class="h-full">
-        <h2 class="font-bold uppercase" v-if="isLoading || !total">
+        <h2 class="font-bold uppercase">
           {{ t("Activity") }}
         </h2>
-        <div
-          v-if="isLoading"
-          class="flex justify-content-center align-items-center flex-column mt-4"
+        <DataTable
+          :value="tableData.content"
+          paginator
+          currentPageReportTemplate="{ currentPage }"
+          :rows="tableData.rows"
+          :loading="isLoading"
         >
-          <Skeleton class="" shape="circle" size="8rem"></Skeleton>
-        </div>
-        <h4 class="mt-4 text-center" v-else-if="!isLoading && !total">
-          {{ t("No activities") }}
-        </h4>
-        <Chart :options="chartOptions" v-else></Chart>
+          <Column
+            field="activityType"
+            :header="t('Activity Type')"
+            class="w-1 text-sm"
+          >
+          </Column>
+          <Column field="total" :header="t('Total')" class="w-1 text-sm">
+          </Column>
+        </DataTable>
       </div>
     </template>
   </CardComponent>

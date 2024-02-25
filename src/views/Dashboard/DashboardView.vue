@@ -6,6 +6,7 @@ import ActivitiesToTrack from "./ActivitiesToTrack.vue";
 import PerActivity from "./PerActivity.vue";
 import SalesDayByWeek from "./SalesByDayWeek.vue";
 import TotalSales from "./TotalSales.vue";
+import TotalHours from "./TotalHours.vue";
 
 import Filter from "../../components/Filter.vue";
 
@@ -40,6 +41,9 @@ const getStartEndDate = (event) => {
       </div>
       <div class="col-12 md:col-12">
         <TotalSales :date="{ startDate, endDate }" />
+      </div>
+      <div class="col-12">
+        <TotalHours :date="{ startDate, endDate }" />
       </div>
     </div>
   </div>

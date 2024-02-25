@@ -8,6 +8,10 @@ import { Chart } from "highcharts-vue";
 import Highcharts from "highcharts";
 import highchartsMore from "highcharts/highcharts-more";
 
+import DataTable from "primevue/datatable";
+import Column from "primevue/column"; // optional
+import Row from "primevue/row";
+
 import { useDashboardService } from "../../services/DashboardService";
 
 import Skeleton from "primevue/skeleton";
@@ -29,75 +33,41 @@ const props = defineProps({
 
 const dashboardService = useDashboardService();
 
-const isLoading = ref(false);
-const chartOptions = ref({
-  chart: {
-    type: "column",
-    height: 280,
-  },
-  title: {
-    text: t("Total for each activity by Month"),
-    style: {
-      fontWeight: "bold",
-      color: "#4b5563",
-      fontSize: "19px",
-      fontFamily: "Poppins",
-      textTransform: "Uppercase",
+const tableData = ref({
+  content: [
+    {
+      month: "January",
+      id: 1,
+      detail: [
+        {
+          activityType: "Dials",
+          total: 100,
+        },
+        {
+          activityType: "Doorknocks",
+          total: 100,
+        },
+      ],
     },
-    align: "left",
-  },
-  colors: ["#2ec867", "#619cf9", "#e9b310", "#234a72"],
-  xAxis: {
-    categories: [
-      "Jan",
-      "Feb",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "Aug",
-      "Sept",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
-  },
-  yAxis: {
-    min: 0,
-    title: {
-      text: "Amount",
+    {
+      month: "February",
+      id: 2,
+      detail: [
+        {
+          activityType: "Dials",
+          total: 200,
+        },
+        {
+          activityType: "Doorknocks",
+          total: 200,
+        },
+      ],
     },
-    stackLabels: {
-      enabled: true,
-    },
-  },
-  legend: {
-    align: "left",
-    x: 400,
-    verticalAlign: "top",
-    y: -4,
-    floating: true,
-    backgroundColor:
-      Highcharts.defaultOptions.legend.backgroundColor || "white",
-    borderColor: "#CCC",
-    borderWidth: 1,
-    shadow: false,
-  },
-  tooltip: {
-    headerFormat: "<b>{point.x}</b><br/>",
-    pointFormat: "{series.name}: {point.y}<br/>Total: {point.stackTotal}",
-  },
-  plotOptions: {
-    column: {
-      stacking: "normal",
-      dataLabels: {
-        enabled: true,
-      },
-    },
-  },
-  series: [],
+  ],
+  rows: 10,
 });
+const expandedRows = ref([]);
+const isLoading = ref(false);
 
 const getTotalSalesData = async () => {
   const result =
@@ -106,38 +76,6 @@ const getTotalSalesData = async () => {
       year: day(props.date.startDate).format("YYYY"),
     }).toString();
   try {
-    let chartData = {};
-    isLoading.value = true;
-    const res = await dashboardService.getActivityCountPerMonth(result);
-    const convertDataToArray = Object.values(res.data);
-    let total = 0;
-    if (convertDataToArray.length) {
-      convertDataToArray.forEach((chartItems) => {
-        const keys = Object.keys(chartItems);
-        const values = Object.values(chartItems);
-
-        keys.forEach((key, index) => {
-          if (!chartData[key]) {
-            chartData[key] = {
-              name: key,
-              data: [values[index]],
-            };
-            total = total + values[index];
-          } else {
-            chartData[key] = {
-              name: key,
-              data: [...chartData[key].data, values[index]],
-            };
-            total = total + values[index];
-          }
-        });
-      });
-      chartOptions.value.series = Object.values(chartData);
-      chartOptions.value.subtitle = {
-        ...chartOptions.value.subtitle,
-        text: `${t("Total")}:${total}`,
-      };
-    }
   } catch (err) {
     toast.add({
       severity: "error",
@@ -173,25 +111,31 @@ onMounted(() => {
   <CardComponent>
     <template #content>
       <div class="h-full">
-        <h2
-          class="font-bold uppercase"
-          v-if="isLoading || !chartOptions.series.length"
-        >
+        <h2 class="font-bold uppercase">
           {{ t("Total for each activity by Month") }}
         </h2>
-        <div
-          v-if="isLoading"
-          class="flex justify-content-center align-items-center flex-column mt-4"
+        <DataTable
+          v-model:expandedRows="expandedRows"
+          :value="tableData.content"
+          currentPageReportTemplate="{ currentPage }"
+          :rows="tableData.rows"
+          :loading="isLoading"
+          dataKey="id"
         >
-          <Skeleton class="w-full h-10rem"></Skeleton>
-        </div>
-        <h4
-          class="mt-4 text-center"
-          v-else-if="!isLoading && !chartOptions.series.length"
-        >
-          {{ t("No activities") }}
-        </h4>
-        <Chart :options="chartOptions" v-else></Chart>
+          <Column expander style="width: 5rem" />
+          <Column field="month" :header="t('Month')"></Column>
+          <template #expansion="slotProps">
+            <div class="p-3">
+              <DataTable :value="slotProps.data.detail">
+                <Column
+                  field="activityType"
+                  :header="t('Activity Type')"
+                ></Column>
+                <Column field="total" :header="t('Total')"></Column>
+              </DataTable>
+            </div>
+          </template>
+        </DataTable>
       </div>
     </template>
   </CardComponent>

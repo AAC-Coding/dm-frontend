@@ -120,4 +120,9 @@ export default {
     "Are you sure to delete activity type {name}",
   Custom: "Create Custom",
   "Activity deleted successfully": "Activity deleted successfully",
+  Month: "Month",
+  Period: "Period",
+  Hour: "Hour",
+  "Total Hours Worked": "Total Hours Worked",
+  "No data": "No data",
 };

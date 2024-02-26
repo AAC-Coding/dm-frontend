@@ -11,12 +11,14 @@ import highchartsMore from "highcharts/highcharts-more";
 import { useDashboardService } from "../../services/DashboardService";
 
 import Skeleton from "primevue/skeleton";
+import { useToast } from "primevue/usetoast";
 
 import day from "dayjs";
 
 highchartsMore(Highcharts);
 
 const { t } = useI18n();
+const toast = useToast();
 
 const props = defineProps({
   date: {
@@ -108,6 +110,7 @@ const getTotalSalesData = async () => {
     isLoading.value = true;
     const res = await dashboardService.getActivityCountPerMonth(result);
     const convertDataToArray = Object.values(res.data);
+    let total = 0;
     if (convertDataToArray.length) {
       convertDataToArray.forEach((chartItems) => {
         const keys = Object.keys(chartItems);
@@ -119,22 +122,28 @@ const getTotalSalesData = async () => {
               name: key,
               data: [values[index]],
             };
+            total = total + values[index];
           } else {
             chartData[key] = {
               name: key,
               data: [...chartData[key].data, values[index]],
             };
+            total = total + values[index];
           }
         });
       });
       chartOptions.value.series = Object.values(chartData);
+      chartOptions.value.subtitle = {
+        ...chartOptions.value.subtitle,
+        text: `${t("Total")}:${total}`,
+      };
     }
   } catch (err) {
     toast.add({
       severity: "error",
       detail:
-        response?.data?.message ||
-        `${t("There was an error creating your account, please try again")}.`,
+        err?.response?.data?.message ||
+        `${t("There was an error, please try again")}.`,
       sticky: true,
       styleClass: "error",
       closable: false,
@@ -174,7 +183,7 @@ onMounted(() => {
           v-if="isLoading"
           class="flex justify-content-center align-items-center flex-column mt-4"
         >
-          <Skeleton class="" shape="circle" size="8rem"></Skeleton>
+          <Skeleton class="w-full h-10rem"></Skeleton>
         </div>
         <h4
           class="mt-4 text-center"

@@ -23,12 +23,29 @@ const menu = [
     },
   },
   {
-    href: "/activity-tracking",
-    title: t("Activity Tracking"),
+    title: t("Activities Group"),
     icon: {
       element: "i",
-      class: "pi pi-list",
+      class: "pi pi-check",
     },
+    child: [
+      {
+        href: "/activities",
+        title: t("Activities"),
+        icon: {
+          element: "i",
+          class: "pi pi-list",
+        },
+      },
+      {
+        href: "/activity-tracking",
+        title: t("Activity Tracking"),
+        icon: {
+          element: "i",
+          class: "pi pi-list",
+        },
+      },
+    ],
   },
   {
     href: "/payments",
@@ -66,6 +83,12 @@ const logout = () => {
     background-color: white;
     box-shadow: 1px 1px 1px 2px rgba(0, 0, 0, 0.075);
     border-radius: 23px;
+    .vsm--dropdown {
+      background-color: white;
+      .vsm--item {
+        margin-top: 0px !important;
+      }
+    }
     .vsm--title {
       color: var(--text-color);
       font-size: 17px;
@@ -141,7 +164,7 @@ const logout = () => {
 </style>
 <template>
   <div class="sidebar-layout flex h-screen w-screen">
-    <SidebarMenu :menu="menu" class="h-full w-full relative">
+    <SidebarMenu :menu="menu" class="h-full w-full relative" :collapsed="true">
       <template v-slot:footer>
         <div class="footer-wrapper">
           <div class="flex justify-content-center relative mb-4">

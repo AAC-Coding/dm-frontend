@@ -7,19 +7,18 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column"; // optional
 import Row from "primevue/row";
 
-import CreateCarrier from "./CreateCarrier.vue";
-import Filter from "../../components/Filter.vue";
+import CreateActivitiyType from "./CreateActivitiyType.vue";
 
 import { useToast } from "primevue/usetoast";
 import Toast from "primevue/toast";
 
-import { useCarrierService } from "../../services/CarrierService";
+import { useActivitiesService } from "../../services/ActivitiesService";
 
 import day from "dayjs";
 
 const { t } = useI18n();
 const toast = useToast();
-const carrierService = useCarrierService();
+const activitiesService = useActivitiesService();
 
 let startDate = day().format("YYYY-MM-DD");
 let endDate = "";
@@ -29,7 +28,6 @@ const visibleAlert = ref(false);
 const currentPage = ref(0);
 const isLoading = ref(false);
 const currentRowId = ref(null);
-const currentCarrier = ref({});
 
 const tableData = ref({
   content: [],
@@ -38,17 +36,18 @@ const tableData = ref({
 });
 
 const currentRowData = ref({});
+const currentActivityType = ref({});
 //METHODS
 const getPage = async (paginationOptions) => {
   const result = "?" + new URLSearchParams(paginationOptions).toString();
   try {
-    const res = await carrierService.getCarriers(result);
-    tableData.value.content = res.data.carriers.map((carrier) => {
-      const { id, notes, carrier_name } = carrier;
+    const res = await activitiesService.getActivitiesType(result);
+    tableData.value.content = res.data.activity_types.map((activityType) => {
+      const { id, name, duration } = activityType;
       return {
         id,
-        notes,
-        carrierName: carrier_name,
+        activityType: name,
+        duration,
       };
     });
   } catch (err) {
@@ -74,18 +73,16 @@ const onPageChange = async (paginationData) => {
 
 const deleteCarrier = async (id, closeCallback) => {
   try {
-    await carrierService.deleteCarrier(id);
+    await activitiesService.deleteActivityType(id);
     getPage({
       page: 0,
       per_page: 10,
-      last_doc_id: null,
-      start_date: day().format("YYYY-MM-DD"),
     });
     closeCallback();
     toast.add({
       severity: "",
       summary: "",
-      detail: `${t("Carrier deleted successfully")}.`,
+      detail: `${t("Activity type deleted successfully")}.`,
       sticky: true,
       styleClass: "success",
       closable: false,
@@ -125,11 +122,13 @@ const editRow = (data) => {
 const showDeleteAlert = (data) => {
   toast.add({
     severity: "custom",
-    summary: t("Are you sure to delete carrier", { name: data.carrierName }),
-    group: "carrierView",
+    summary: t("Are you sure to delete activity type", {
+      name: data.activityType,
+    }),
+    group: "activitiesView",
   });
   visibleAlert.value = true;
-  currentCarrier.value = data;
+  currentActivityType.value = data;
 };
 
 watch(visible, (isVisible) => {
@@ -152,9 +151,8 @@ onMounted(() => {
 <template>
   <div class="h-full">
     <h1 class="uppercase text-color font-bold text-center mt-5 mb-2">
-      {{ t("Carriers") }}
+      {{ t("Activities type") }}
     </h1>
-    <Filter @onStartEndDate="getStartEndDate" />
     <DataTable
       :value="tableData.content"
       paginator
@@ -169,19 +167,24 @@ onMounted(() => {
           <Button
             class="h-2rem flex align-items-center"
             type="button"
-            :label="t('Create carrier')"
+            :label="t('Create Activity Type')"
             @click="visible = true"
           />
         </div>
       </template>
-      <Column field="carrierName" :header="t('Name')" class="w-1 text-sm">
+      <Column
+        field="activityType"
+        :header="t('Activity Type')"
+        class="w-1 text-sm"
+      >
       </Column>
-      <Column field="notes" :header="t('Notes')" class="w-1 text-sm"> </Column>
+      <Column field="duration" :header="t('Duration')" class="w-1 text-sm">
+      </Column>
       <Column field="actions" :header="t('Actions')" class="w-1 text-sm">
         <template #body="{ data }">
           <div>
             <i
-              class="pi pi-pencil mr-3 cursor-pointer"
+              class="pi pi-pencil mr-4 cursor-pointer"
               @click="editRow(data)"
             ></i>
             <i
@@ -194,7 +197,7 @@ onMounted(() => {
     </DataTable>
     <Toast
       position="center"
-      group="carrierView"
+      group="activitiesView"
       @close="visibleAlert = false"
       class="custom-toast"
     >
@@ -215,7 +218,7 @@ onMounted(() => {
                 label="Yes"
                 text
                 class="py-1 px-2 primary"
-                @click="deleteCarrier(currentCarrier?.id, closeCallback)"
+                @click="deleteCarrier(currentActivityType?.id, closeCallback)"
               ></Button>
               <Button
                 label="No"
@@ -228,7 +231,7 @@ onMounted(() => {
         </section>
       </template>
     </Toast>
-    <CreateCarrier
+    <CreateActivitiyType
       :visible="visible"
       :currentRowData="currentRowData"
       @onChangeVisibleState="visible = $event"

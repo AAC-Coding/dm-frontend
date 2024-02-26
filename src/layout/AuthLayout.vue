@@ -21,7 +21,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="background-image"></div>
   <div
     class="login-view-wrapper flex flex-column align-items-center w-full h-full relative px-3 md:justify-content-between md:px-0 sm:flex-row"
   >
@@ -83,13 +82,12 @@ onMounted(() => {
 </template>
 
 <style scoped lang="less">
-.background-image {
-  background-image: url("../assets/success.jpg");
-  background-position: center;
-  background-size: contain;
-}
 .login-view-wrapper {
   overflow: hidden;
+  background-image: url("../assets/success.png");
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   .logo {
     width: 300px;
     height: 300px;
@@ -100,52 +98,37 @@ onMounted(() => {
   }
 }
 
-// @media only screen and (min-width: 1300px) and (max-width: 1400px) {
-//   .login-view-wrapper {
-//     background-size: 100% 100%;
-//   }
-// }
-// @media only screen and (min-width: 1290px) and (max-width: 1300px) {
-//   .login-view-wrapper {
-//     background-size: 110% 110%;
-//   }
-// }
-// @media only screen and (min-width: 1000px) and (max-width: 1289px) {
-//   .login-view-wrapper {
-//     background-size: 100% 50%;
-//   }
-// }
+@media only screen and (min-width: 1300px) and (max-width: 1400px) {
+  .login-view-wrapper {
+    background-size: 100% 100%;
+  }
+}
+@media only screen and (min-width: 1290px) and (max-width: 1300px) {
+  .login-view-wrapper {
+    background-size: 120% 120%;
+  }
+}
+@media only screen and (min-width: 601px) and (max-width: 800px) {
+  .login-view-wrapper {
+    background-size: 90% 40%;
+  }
+}
+@media (min-width: 1290px) {
+  .login-view-wrapper {
+    .mobile.policies,
+    .mobile.copyrigh {
+      visibility: hidden;
+    }
+  }
+}
 
-// @media only screen and (min-width: 900px) and (max-width: 1000px) {
-//   .login-view-wrapper {
-//     background-size: 90% 60%;
-//   }
-// }
-// @media only screen and (min-width: 800px) and (max-width: 900px) {
-//   .login-view-wrapper {
-//     background-size: 90% 50%;
-//   }
-// }
-// @media only screen and (min-width: 601px) and (max-width: 800px) {
-//   .login-view-wrapper {
-//     background-size: 90% 40%;
-//   }
-// }
-// @media (min-width: 1290px) {
-//   .login-view-wrapper {
-//     .mobile.policies,
-//     .mobile.copyrigh {
-//       visibility: hidden;
-//     }
-//   }
-// }
-
-@media (max-width: 1163px) {
+@media (max-width: 1240px) {
   .login-view-wrapper {
     flex-direction: column !important;
     justify-content: start !important;
     background-position: bottom;
     backdrop-filter: blur(3px);
+    background-size: 90% 60%;
     .desktop.policies,
     .desktop.copyright {
       visibility: hidden;
@@ -162,6 +145,26 @@ onMounted(() => {
     }
   }
 }
+@media only screen and (min-width: 1000px) and (max-width: 1239px) {
+  .login-view-wrapper {
+    background-size: 90% 50%;
+  }
+}
+@media only screen and (min-width: 900px) and (max-width: 999px) {
+  .login-view-wrapper {
+    background-size: 100% 50%;
+  }
+}
+@media only screen and (min-width: 800px) and (max-width: 899px) {
+  .login-view-wrapper {
+    background-size: 105% 50%;
+  }
+}
+@media only screen and (min-width: 700px) and (max-width: 799px) {
+  .login-view-wrapper {
+    background-size: 110% 50%;
+  }
+}
 
 @media (max-width: 600px) {
   .background-image {
@@ -171,7 +174,6 @@ onMounted(() => {
     background-image: none;
   }
   .login-view-wrapper {
-    // background-size: 100vw 40vh;
     flex-direction: column !important;
 
     .login-card {
